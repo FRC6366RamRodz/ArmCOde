@@ -16,16 +16,19 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Extend extends SubsystemBase {
   /** Creates a new Extend. */
   private final TalonFX extend;
+  private final CANcoder _extendCANcoder;
 
   private final MotionMagicVoltage mmVolts = new MotionMagicVoltage(0).withSlot(0);
 
   public Extend() {
   extend = new TalonFX(20, "roborio");
+  _extendCANcoder = new CANcoder(23,"roborio");
   TalonFXConfiguration cfg = new TalonFXConfiguration();
   Slot0Configs slot0 = cfg.Slot0;
     slot0.kS = 0.25; // Add 0.25 V output to overcome static friction
@@ -39,14 +42,26 @@ public class Extend extends SubsystemBase {
            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(1)) // Take approximately 0.5 seconds to reach max vel
            // Take approximately 0.1 seconds to reach max accel 
            .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
-           fdb.SensorToMechanismRatio = 36;
+           fdb.SensorToMechanismRatio = 1;
+           fdb.RotorToSensorRatio = 36;
+             fdb.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder; //rezero CANcoder
+             fdb.FeedbackRemoteSensorID = _extendCANcoder.getDeviceID();
             //  cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder; //rezero CANcoder
             //  cfg.Feedback.FeedbackRemoteSensorID = _pivotCANcoder.getDeviceID();
            extend.optimizeBusUtilization(50,20);
+           extend.setPosition(_extendCANcoder.getAbsolutePosition().getValueAsDouble());
            extend.getConfigurator().apply(cfg);
   }
 
   public void moveExtend(double rotations){
     extend.setControl(mmVolts.withPosition(rotations).withSlot(0));
   }
+
+  public boolean extendAtSetPoint(double atPosition){
+    boolean positionTrueFalse;
+    double difference = Math.abs(atPosition -  _extendCANcoder.getAbsolutePosition().getValueAsDouble()); //gets difference of the two
+    positionTrueFalse = difference < 0.1; //sets the difference and how much it should be
+       SmartDashboard.putBoolean("ExtendAtSetPoint", positionTrueFalse); //prints whether its true or false
+    return positionTrueFalse; //returns true or false
+    }
 }

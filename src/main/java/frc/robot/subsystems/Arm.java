@@ -11,6 +11,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase{
@@ -34,14 +35,27 @@ public class Arm extends SubsystemBase{
            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(1)) // Take approximately 0.5 seconds to reach max vel
            // Take approximately 0.1 seconds to reach max accel 
            .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(100));
-           fdb.SensorToMechanismRatio = 63;
-             cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder; //rezero CANcoder
-             cfg.Feedback.FeedbackRemoteSensorID = _pivotCANcoder.getDeviceID();
+           fdb.SensorToMechanismRatio = 1;
+           fdb.RotorToSensorRatio = 63;
+             fdb.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder; //rezero CANcoder
+             fdb.FeedbackRemoteSensorID = _pivotCANcoder.getDeviceID();
            pivot.optimizeBusUtilization(50,20);
+           pivot.setPosition(_pivotCANcoder.getAbsolutePosition().getValueAsDouble());
            pivot.getConfigurator().apply(cfg);}
 
     public void moveArm(double rotations){
       pivot.setControl(mmVolts.withPosition(rotations).withSlot(0));
     }
 
+    public boolean armAtSetPoint(double atPosition){
+    boolean positionTrueFalse;
+    double difference = Math.abs(atPosition -  _pivotCANcoder.getAbsolutePosition().getValueAsDouble()); //gets difference of the two
+    positionTrueFalse = difference < 0.1; //sets the difference and how much it should be
+    SmartDashboard.putBoolean("ArmAtSetPoint", positionTrueFalse); //prints whether its true or false
+    return positionTrueFalse; //returns true or false
+    }
+
+//     public void setArmSpeed(double setArmSpeed){
+// pivot.motionMAgic
+//     }
 }

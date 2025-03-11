@@ -57,9 +57,28 @@ public class RobotContainer {
 
     // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
     // cancelling on release.
-    m_driverController.b().whileTrue
-    (Commands.parallel(Commands.run(() -> arm.moveArm(0.6), arm), 
-    Commands.run(() -> extend.moveExtend(0.6), extend)));
+    // m_driverController.b().whileTrue
+    // (Commands.parallel(Commands.run(() -> arm.moveArm(0.6), arm), 
+    // Commands.run(() -> extend.moveExtend(0.6), extend)));
+
+    // m_driverController.b().whileTrue
+    //  (Commands.startRun(() -> arm.moveArm(0.6), arm.position(0), arm));
+
+
+    m_driverController.a().whileTrue
+    (Commands.sequence(Commands.run(() -> arm.moveArm(0.6), arm)
+    .until(() -> arm.armAtSetPoint(0.6)).andThen(
+    Commands.run(() -> extend.moveExtend(0.6), extend))));
+
+    m_driverController.leftBumper().and(m_driverController.a()).whileTrue
+    (Commands.sequence(Commands.run(() -> arm.moveArm(0.63))
+    .until(() -> arm.armAtSetPoint(0.63)).andThen(
+     Commands.run(() -> extend.moveExtend(0.4)))));
+
+    m_driverController.leftTrigger().whileTrue
+    (Commands.sequence(Commands.run(() -> arm.moveArm(0.1), arm)
+    .until(() -> arm.armAtSetPoint(0.1)).andThen(
+     Commands.run(() -> extend.moveExtend(0.2), extend))));
 
     // m_driverController.a().whileTrue
     // (Commands.run(() -> extend.moveExtend(0.6), extend));
