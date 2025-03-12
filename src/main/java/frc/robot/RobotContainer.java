@@ -49,8 +49,9 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    arm.setDefaultCommand(Commands.run(() -> arm.moveArm(0), arm));
-    extend.setDefaultCommand(Commands.run(() -> extend.moveExtend(0), extend));
+    // arm.setDefaultCommand(Commands.run(() -> arm.moveArm(0), arm));
+    extend.setDefaultCommand(Commands.run(() -> extend.moveExtend(0), extend).until(() -> extend.extendAtSetPoint(0))
+    .andThen(() -> arm.moveArm(0), arm));
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     // new Trigger(m_exampleSubsystem::exampleCondition)
     //     .onTrue(new ExampleCommand(m_exampleSubsystem));
@@ -62,23 +63,28 @@ public class RobotContainer {
     // Commands.run(() -> extend.moveExtend(0.6), extend)));
 
     // m_driverController.b().whileTrue
-    //  (Commands.startRun(() -> arm.moveArm(0.6), arm.position(0), arm));
+    //  (Commands.run(() -> arm.moveArm(0.45)));
+
+         m_driverController.a().whileTrue
+    (Commands.sequence(Commands.run(() -> arm.moveArm(0.47), arm)
+    .until(() -> arm.armAtSetPoint(0.47)).andThen(
+    Commands.run(() -> extend.moveExtend(1.6), extend))));
 
 
-    m_driverController.a().whileTrue
-    (Commands.sequence(Commands.run(() -> arm.moveArm(0.6), arm)
-    .until(() -> arm.armAtSetPoint(0.6)).andThen(
-    Commands.run(() -> extend.moveExtend(0.6), extend))));
+    // m_driverController.a().whileTrue
+    // (Commands.sequence(Commands.run(() -> arm.moveArm(0.6), arm)
+    // .until(() -> arm.armAtSetPoint(0.6)).andThen(
+    // Commands.run(() -> extend.moveExtend(0.6), extend))));
 
     m_driverController.leftBumper().and(m_driverController.a()).whileTrue
-    (Commands.sequence(Commands.run(() -> arm.moveArm(0.63))
-    .until(() -> arm.armAtSetPoint(0.63)).andThen(
-     Commands.run(() -> extend.moveExtend(0.4)))));
+    (Commands.sequence(Commands.run(() -> arm.moveArm(0.52))
+    .until(() -> arm.armAtSetPoint(0.52)).andThen(
+     Commands.run(() -> extend.moveExtend(1)))));
 
-    m_driverController.leftTrigger().whileTrue
-    (Commands.sequence(Commands.run(() -> arm.moveArm(0.1), arm)
-    .until(() -> arm.armAtSetPoint(0.1)).andThen(
-     Commands.run(() -> extend.moveExtend(0.2), extend))));
+    // m_driverController.leftTrigger().whileTrue
+    // (Commands.sequence(Commands.run(() -> arm.moveArm(0.1), arm)
+    // .until(() -> arm.armAtSetPoint(0.1)).andThen(
+    //  Commands.run(() -> extend.moveExtend(0.2), extend))));
 
     // m_driverController.a().whileTrue
     // (Commands.run(() -> extend.moveExtend(0.6), extend));
