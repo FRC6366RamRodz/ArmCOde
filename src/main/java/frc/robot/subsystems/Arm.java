@@ -24,12 +24,10 @@ public class Arm extends SubsystemBase{
         _pivotCANcoder = new CANcoder(22, "roborio");
         TalonFXConfiguration cfg = new TalonFXConfiguration();
           Slot0Configs slot0 = cfg.Slot0;
-    slot0.kS = 0.25; // Add 0.25 V output to overcome static friction
-    slot0.kV = 0.12; // A velocity target of 1 rps results in 0.12 V output
-    slot0.kA = 0.01; // An acceleration of 1 rps/s requires 0.01 V output
-    slot0.kP = 60; // A position error of 0.2 rotations results in 12 V output
+    slot0.kP = 5; // A position error of 0.2 rotations results in 12 V output
     slot0.kI = 0; // No output for integrated error
-    slot0.kD = 0.5; // A velocity error of 1 rps results in 0.5 V output
+    slot0.kD = 0; // A velocity error of 1 rps results in 0.5 V output
+    slot0.kG = 0.35;
            FeedbackConfigs fdb = cfg.Feedback;
            cfg.MotionMagic.withMotionMagicCruiseVelocity(RotationsPerSecond.of(0.5)) // 5 (mechanism) rotations per second cruise
            .withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(1)) // Take approximately 0.5 seconds to reach max vel
@@ -39,9 +37,15 @@ public class Arm extends SubsystemBase{
            fdb.RotorToSensorRatio = 63;
              fdb.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder; //rezero CANcoder
              fdb.FeedbackRemoteSensorID = _pivotCANcoder.getDeviceID();
+             cfg.SoftwareLimitSwitch.ForwardSoftLimitEnable =true;
+             cfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = .6;
+             cfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+             cfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -.23;
+             cfg.ClosedLoopGeneral.ContinuousWrap = false;
            pivot.optimizeBusUtilization(50,20);
            pivot.setPosition(_pivotCANcoder.getAbsolutePosition().getValueAsDouble());
-           pivot.getConfigurator().apply(cfg);}
+           pivot.getConfigurator().apply(cfg);
+            }
 
     public void moveArm(double rotations){
       pivot.setControl(mmVolts.withPosition(rotations).withSlot(0));
@@ -56,6 +60,6 @@ public class Arm extends SubsystemBase{
     }
 
 //     public void setArmSpeed(double setArmSpeed){
-// pivot.motionMAgic
+// pivot.MotionMagic.withMotionMagicAcceleration(r);
 //     }
 }

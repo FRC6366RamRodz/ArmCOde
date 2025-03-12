@@ -49,8 +49,8 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    arm.setDefaultCommand(Commands.run(() -> arm.moveArm(0), arm));
-    extend.setDefaultCommand(Commands.run(() -> extend.moveExtend(0), extend));
+    arm.setDefaultCommand(Commands.run(() -> arm.moveArm(-0.21), arm));
+    extend.setDefaultCommand(Commands.run(() -> extend.moveExtend(-0.01), extend));
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     // new Trigger(m_exampleSubsystem::exampleCondition)
     //     .onTrue(new ExampleCommand(m_exampleSubsystem));
@@ -63,22 +63,43 @@ public class RobotContainer {
 
     // m_driverController.b().whileTrue
     //  (Commands.startRun(() -> arm.moveArm(0.6), arm.position(0), arm));
+    //L4 0.474
+    //L3 0.538
+    //L2 0.628
+
+    // m_driverController.b().whileTrue
+    // (Commands.sequence(Commands.run(() -> arm.moveArm(0.538), arm)
+    // .until(() -> arm.armAtSetPoint(0.538)).andThen(
+    // Commands.run(() -> extend.moveExtend(0.0), extend)))); //L2
+
+    m_driverController.y().whileTrue
+    (Commands.sequence(Commands.run(() -> arm.moveArm(0.277), arm)
+    .until(() -> arm.armAtSetPoint(0.277)).andThen(
+    Commands.run(() -> extend.moveExtend(1.634), extend)))); //L4
 
 
-    m_driverController.a().whileTrue
-    (Commands.sequence(Commands.run(() -> arm.moveArm(0.6), arm)
-    .until(() -> arm.armAtSetPoint(0.6)).andThen(
-    Commands.run(() -> extend.moveExtend(0.6), extend))));
+    // m_driverController.a().whileTrue
+    // (Commands.sequence(Commands.run(() -> arm.moveArm(0.474), arm)
+    // .until(() -> arm.armAtSetPoint(0.474)).andThen(
+    // Commands.run(() -> extend.moveExtend(0.0), extend)))); //L2
 
-    m_driverController.leftBumper().and(m_driverController.a()).whileTrue
-    (Commands.sequence(Commands.run(() -> arm.moveArm(0.63))
-    .until(() -> arm.armAtSetPoint(0.63)).andThen(
-     Commands.run(() -> extend.moveExtend(0.4)))));
+    // m_driverController.leftBumper().or(m_driverController.a())
+    // .or(m_driverController.b()).whileTrue
+    // (Commands.sequence(Commands.run(() -> arm.moveArm(0.6))
+    // .until(() -> arm.armAtSetPoint(0.6)).andThen(
+    //  Commands.run(() -> extend.moveExtend(0.0))))); //L2 and L3
 
-    m_driverController.leftTrigger().whileTrue
-    (Commands.sequence(Commands.run(() -> arm.moveArm(0.1), arm)
-    .until(() -> arm.armAtSetPoint(0.1)).andThen(
-     Commands.run(() -> extend.moveExtend(0.2), extend))));
+    // m_driverController.leftTrigger().whileTrue
+    // (Commands.sequence(Commands.run(() -> arm.moveArm(0.1), arm)
+    // .until(() -> arm.armAtSetPoint(0.1)).andThen(
+    //  Commands.run(() -> extend.moveExtend(0.0), extend))));
+
+     m_driverController.leftBumper().and(m_driverController.y()).whileTrue
+     (Commands.sequence(Commands.run(() -> arm.moveArm(0.29))
+     .until(() -> arm.armAtSetPoint(0.29)).andThen(
+      Commands.run(() -> extend.moveExtend(0.0))))); //score L2
+
+      // m_driverController.start().whileTrue(Commands.runOnce(()-> extend.setZero(), extend));
 
     // m_driverController.a().whileTrue
     // (Commands.run(() -> extend.moveExtend(0.6), extend));
