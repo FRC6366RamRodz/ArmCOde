@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -25,6 +26,8 @@ public class Extend extends SubsystemBase {
   // private final CANcoder _extendCANcoder;
 
   private final MotionMagicVoltage mmVolts = new MotionMagicVoltage(0).withSlot(0);
+  private final VoltageOut voltageOut = new VoltageOut(0.0).withEnableFOC(true).withUpdateFreqHz(0);
+
 
   public Extend() {
   extend = new TalonFX(20, "roborio");
@@ -55,6 +58,10 @@ public class Extend extends SubsystemBase {
 
   public void moveExtend(double rotations){
     extend.setControl(mmVolts.withPosition(rotations).withSlot(0));
+  }
+
+  public void runVolts(double volts){
+    extend.setControl(voltageOut.withOutput(volts));
   }
 
   public boolean extendAtSetPoint(double atPosition){
